@@ -3,31 +3,32 @@
 version: "2.4"
 
 services:
-  postgres:
-    image: postgres:${POSTGRES_IMAGE_TAG}
-    restart: ${RESTART_POLICY}
-    security_opt:
-      - no-new-privileges:true
-    pids_limit: 100
-    read_only: true
-    tmpfs:
-      - /tmp
-      - /var/run/postgresql
-    volumes:
-      - ${POSTGRES_DATA_PATH}:/var/lib/postgresql/data
-    environment:
-      # timezone inside container
-      - TZ
+  # postgres:
+  #   image: postgres:${POSTGRES_IMAGE_TAG}
+  #   restart: ${RESTART_POLICY}
+  #   security_opt:
+  #     - no-new-privileges:true
+  #   pids_limit: 100
+  #   read_only: true
+  #   tmpfs:
+  #     - /tmp
+  #     - /var/run/postgresql
+  #   volumes:
+  #     - ${POSTGRES_DATA_PATH}:/var/lib/postgresql/data
+  #   environment:
+  #     # timezone inside container
+  #     - TZ
 
-      # necessary Postgres options/variables
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
+  #     # necessary Postgres options/variables
+  #     - POSTGRES_USER
+  #     - POSTGRES_PASSWORD
+  #     - POSTGRES_DB
 
   mattermost:
-    depends_on:
-      - postgres
+    # depends_on:
+    #   - postgres
     image: mattermost/${MATTERMOST_IMAGE}:${MATTERMOST_IMAGE_TAG}
+    container_name: rkt-mattermost
     restart: ${RESTART_POLICY}
     security_opt:
       - no-new-privileges:true
@@ -48,6 +49,9 @@ services:
       # - ${GITLAB_PKI_CHAIN_PATH}:/etc/ssl/certs/pki_chain.pem:ro
     environment:
       # timezone inside container
+      - POSTGRES_DB=${POSTGRES_MM_DB}
+      - POSTGRES_USER=${POSTGRES_MM_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_MM_PASSWORD}
       - TZ
 
       # necessary Mattermost options/variables (see env.example)
